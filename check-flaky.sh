@@ -40,9 +40,6 @@ while getopts ":s" opt; do
     esac
 done
 
-echo $do_setup
-exit 0
-
 if [ ! -z "${do_setup}" ]; then
     setup
 fi
