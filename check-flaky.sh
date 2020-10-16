@@ -27,23 +27,23 @@ run_tests(){
     done
 }
 
-main() {
-    do_setup=
-    while getopts ":s" opt; do
-        case ${opt} in
-            s )
-                do_setup=true
-                ;;
-            \? )
-                echo "Usage: cmd [-s]"
-                ;;
-        esac
-    done
 
-    if [ ! -z "${do_setup}" ]; then
-        setup
-    fi
-    run_tests
-}
+do_setup=
+while getopts ":s" opt; do
+    case $opt in
+        s )
+            do_setup=true
+            ;;
+        \? )
+            echo "Usage: cmd [-s]"
+            ;;
+    esac
+done
 
-main
+echo $do_setup
+exit 0
+
+if [ ! -z "${do_setup}" ]; then
+    setup
+fi
+run_tests
