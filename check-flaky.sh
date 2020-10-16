@@ -3,7 +3,7 @@
 set -e
 set -x
 
-FLAKY_TEST_ID=${1}
+BASEDIR=$(dirname "$0")
 
 setup(){
     local num_nodes=${1:-2}
@@ -17,12 +17,14 @@ setup(){
 }
 
 run_tests(){
-    local test_id=${1}
-    local iterations=${2:-15}
+    local iterations=${1:-15}
 
-    export FUNC_TEST_ARGS="-focus=test_id:${test_id}"
-    for i in $(seq ${iterations}); do make functest; done
+
+    while IFS= read -r test_id; do
+        export FUNC_TEST_ARGS="-focus=test_id:${test_id}"
+        for i in $(seq ${iterations}); do make functest; done
+    done < ${BASEDIR}/to-test.txt
 }
 
 setup
-run_tests ${FLAKY_TEST_ID}
+run_tests
