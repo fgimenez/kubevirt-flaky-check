@@ -1,7 +1,6 @@
 #!/bin/bash
 
-set -e
-set -x
+set -ex
 
 BASEDIR=$(dirname "$0")
 
@@ -19,12 +18,32 @@ setup(){
 run_tests(){
     local iterations=${1:-15}
 
+    test_ids=$(cat ${BASEDIR}/to-test.txt)
+    IFS=$'\n'
 
-    while IFS= read -r test_id; do
+    for test_id in ${test_ids}; do
         export FUNC_TEST_ARGS="-focus=test_id:${test_id}"
         for i in $(seq ${iterations}); do make functest; done
-    done < ${BASEDIR}/to-test.txt
+    done
 }
 
-setup
-run_tests
+main() {
+    do_setup=
+    while getopts ":s" opt; do
+        case ${opt} in
+            s )
+                do_setup=true
+                ;;
+            \? )
+                echo "Usage: cmd [-s]"
+                ;;
+        esac
+    done
+
+    if [ ! -z "${do_setup}" ]; then
+        setup
+    fi
+    run_tests
+}
+
+main
