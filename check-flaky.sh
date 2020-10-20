@@ -22,7 +22,7 @@ run_tests(){
     IFS=$'\n'
 
     for test_id in ${test_ids}; do
-        export FUNC_TEST_ARGS="-focus=test_id:${test_id}"
+        export FUNC_TEST_ARGS="-focus=${test_id}"
         for i in $(seq ${iterations}); do make functest; done
     done
 }
