@@ -16,13 +16,13 @@ setup(){
 }
 
 run_tests(){
-    local iterations=${1:-15}
+    local iterations=${1:-30}
 
     test_ids=$(cat ${BASEDIR}/to-test.txt)
     IFS=$'\n'
 
     for test_id in ${test_ids}; do
-        export FUNC_TEST_ARGS="-focus=${test_id}"
+        export FUNC_TEST_ARGS="-focus=${test_id} -v"
         for i in $(seq ${iterations}); do make functest; done
     done
 }
