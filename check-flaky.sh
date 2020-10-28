@@ -36,7 +36,8 @@ while getopts ":sn" opt; do
             do_setup=true
             ;;
         n )
-             skip_tests=true
+            do_setup=true
+            skip_tests=true
             ;;
         \? )
             echo "Usage: cmd [-s]"
