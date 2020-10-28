@@ -29,10 +29,14 @@ run_tests(){
 
 
 do_setup=
-while getopts ":s" opt; do
+skip_tests=
+while getopts ":sn" opt; do
     case $opt in
         s )
             do_setup=true
+            ;;
+        n )
+             skip_tests=true
             ;;
         \? )
             echo "Usage: cmd [-s]"
@@ -43,4 +47,6 @@ done
 if [ ! -z "${do_setup}" ]; then
     setup
 fi
-run_tests
+if [ -z "${skip_tests}" ]; then
+    run_tests
+fi
