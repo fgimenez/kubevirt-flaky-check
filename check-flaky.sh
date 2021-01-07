@@ -16,7 +16,7 @@ setup(){
 }
 
 run_tests(){
-    local iterations=${1:-30}
+    local iterations=${1}
 
     test_ids=$(cat ${BASEDIR}/to-test.txt)
     IFS=$'\n'
@@ -32,27 +32,36 @@ run_tests(){
     done
 }
 
+main(){
+    do_setup=
+    skip_tests=
+    iterations=30
+    while getopts ":sni:" opt; do
+        case $opt in
+            s )
+                do_setup=true
+                ;;
+            n )
+                do_setup=true
+                skip_tests=true
+                ;;
+            i )
+                iterations=${OPTARG}
+                ;;
+            \? )
+                echo "Usage: cmd [-s]"
+                ;;
+        esac
+    done
 
-do_setup=
-skip_tests=
-while getopts ":sn" opt; do
-    case $opt in
-        s )
-            do_setup=true
-            ;;
-        n )
-            do_setup=true
-            skip_tests=true
-            ;;
-        \? )
-            echo "Usage: cmd [-s]"
-            ;;
-    esac
-done
+    if [ ! -z "${do_setup}" ]; then
+        setup
+    fi
+    if [ -z "${skip_tests}" ]; then
+        echo iterations: $iterations
+        exit 0
+        run_tests "${iterations}"
+    fi
+}
 
-if [ ! -z "${do_setup}" ]; then
-    setup
-fi
-if [ -z "${skip_tests}" ]; then
-    run_tests
-fi
+main "${@}"
