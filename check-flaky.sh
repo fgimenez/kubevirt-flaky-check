@@ -58,8 +58,6 @@ main(){
         setup
     fi
     if [ -z "${skip_tests}" ]; then
-        echo iterations: $iterations
-        exit 0
         run_tests "${iterations}"
     fi
 }
