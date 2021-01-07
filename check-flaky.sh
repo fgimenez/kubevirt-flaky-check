@@ -23,7 +23,12 @@ run_tests(){
 
     for test_id in ${test_ids}; do
         export FUNC_TEST_ARGS="-focus=${test_id} -v"
-        for i in $(seq ${iterations}); do make functest; done
+        for i in $(seq ${iterations}); do
+            echo ======================
+            echo "Iteration ${i} of ${iterations}"
+            echo ======================
+            make functest
+        done
     done
 }
 
