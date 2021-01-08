@@ -20,13 +20,13 @@ run_tests(){
     local test_ids_in=${1}
     local iterations=${2:-${DEFAULT_ITERATIONS}}
 
-    IFS=';' read -ra test_ids <<< "$test_ids_in"
+    IFS=',' read -ra test_ids <<< "${test_ids_in}"
     for test_id in "${test_ids[@]}"; do
         info "Running tests with focus ${test_id}"
         export FUNC_TEST_ARGS="-focus=${test_id} -v"
         for i in $(seq ${iterations}); do
             info "Iteration ${i} of ${iterations}"
-            #make functest
+            make functest
         done
     done
 }
@@ -40,7 +40,7 @@ info(){
     set -x
 }
 usage(){
-    echo "Usage: check-flaky -t <test_id1;test_id2;...> [-s] [-n] [-i iterations]"
+    echo "Usage: check-flaky [-t <test_id1,test_id2,...>] [-s] [-n] [-i iterations]"
 }
 
 main(){
@@ -70,15 +70,14 @@ main(){
     done
     shift "$((OPTIND-1))"
 
-    if [ -z "${test_ids_in}" ]; then
-        echo Please specify test ids to run with -t
+    if [ -z "${skip_tests}" ] && [ -z "${test_ids_in}" ]; then
+        echo Please specify test ids to run with -t or skip tests with -n
         usage
         exit 1
     fi
 
     if [ ! -z "${do_setup}" ]; then
-        #setup
-        echo setup
+        setup
     fi
     if [ -z "${skip_tests}" ]; then
         run_tests "${test_ids_in}" "${iterations}"
