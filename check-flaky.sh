@@ -2,10 +2,11 @@
 
 set -ex
 
-BASEDIR=$(dirname "$0")
+DEFAULT_ITERATIONS=30
+DEFAULT_NUM_NODES=2
 
 setup(){
-    local num_nodes=${1:-2}
+    local num_nodes=${1:-${DEFAULT_NUM_NODES}}
 
     make cluster-down
     make
@@ -16,27 +17,38 @@ setup(){
 }
 
 run_tests(){
-    local iterations=${1}
+    local test_ids_in=${1}
+    local iterations=${2:-${DEFAULT_ITERATIONS}}
 
-    test_ids=$(cat ${BASEDIR}/to-test.txt)
-    IFS=$'\n'
-
-    for test_id in ${test_ids}; do
+    IFS=';' read -ra test_ids <<< "$test_ids_in"
+    for test_id in "${test_ids[@]}"; do
+        info "Running tests with focus ${test_id}"
         export FUNC_TEST_ARGS="-focus=${test_id} -v"
         for i in $(seq ${iterations}); do
-            echo ======================
-            echo "Iteration ${i} of ${iterations}"
-            echo ======================
-            make functest
+            info "Iteration ${i} of ${iterations}"
+            #make functest
         done
     done
+}
+
+info(){
+    local msg=${1}
+    set +x
+    echo ===============================
+    echo "${msg}"
+    echo ===============================
+    set -x
+}
+usage(){
+    echo "Usage: check-flaky -t <test_id1;test_id2;...> [-s] [-n] [-i iterations]"
 }
 
 main(){
     do_setup=
     skip_tests=
     iterations=30
-    while getopts ":sni:" opt; do
+    test_ids_in=
+    while getopts ":sni:t:" opt; do
         case $opt in
             s )
                 do_setup=true
@@ -48,17 +60,28 @@ main(){
             i )
                 iterations=${OPTARG}
                 ;;
+            t )
+                test_ids_in=${OPTARG}
+                ;;
             \? )
-                echo "Usage: cmd [-s]"
+                usage
                 ;;
         esac
     done
+    shift "$((OPTIND-1))"
+
+    if [ -z "${test_ids_in}" ]; then
+        echo Please specify test ids to run with -t
+        usage
+        exit 1
+    fi
 
     if [ ! -z "${do_setup}" ]; then
-        setup
+        #setup
+        echo setup
     fi
     if [ -z "${skip_tests}" ]; then
-        run_tests "${iterations}"
+        run_tests "${test_ids_in}" "${iterations}"
     fi
 }
 
