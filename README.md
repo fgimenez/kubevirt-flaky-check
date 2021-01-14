@@ -27,5 +27,5 @@ From kubevirt/kubevirt repo, execute:
 /path/to/check-flaky.sh -t rfe_id:123 -i 60
 
 # Create cluster and execute test_id:100 10 times with provider k8s-1.19
-KUBEVIRT_PROVIDER=k8s-1.19 /path/to/check-flaky.sh -t test_id:100 -i 10
+KUBEVIRT_PROVIDER=k8s-1.19 /path/to/check-flaky.sh -s -t test_id:100 -i 10
 ```
