@@ -20,7 +20,6 @@ From kubevirt/kubevirt repo, execute:
 
 ```
 # Create cluster and execute tests test_id:100 and test_id:200 30 times
-
 /path/to/check-flaky.sh -s -t test_id:100|test_id:200 -i 30
 
 # Execute on previously created cluster all tests in rfe_id:123 60 times
