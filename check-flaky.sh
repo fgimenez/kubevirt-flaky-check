@@ -16,18 +16,31 @@ setup(){
     make cluster-sync
 }
 
+run_iterations(){
+    local iterations=${1}
+    local focus=${2}
+
+    if [ ! -z "${focus}" ]; then
+        export FUNC_TEST_ARGS="-focus=${focus} -v"
+    fi
+    for i in $(seq ${iterations}); do
+        info "Iteration ${i} of ${iterations}"
+        make functest
+    done
+}
+
 run_tests(){
     local test_ids_in=${1}
     local iterations=${2:-${DEFAULT_ITERATIONS}}
 
+    if [ -z "${test_ids_in}" ]; then
+        run_iterations "${iterations}"
+    fi
+
     IFS=',' read -ra test_ids <<< "${test_ids_in}"
     for test_id in "${test_ids[@]}"; do
         info "Running tests with focus ${test_id}"
-        export FUNC_TEST_ARGS="-focus=${test_id} -v"
-        for i in $(seq ${iterations}); do
-            info "Iteration ${i} of ${iterations}"
-            make functest
-        done
+        run_iterations "${iterations}" "${test_id}"
     done
 }
 
@@ -69,12 +82,6 @@ main(){
         esac
     done
     shift "$((OPTIND-1))"
-
-    if [ -z "${skip_tests}" ] && [ -z "${test_ids_in}" ]; then
-        echo Please specify test ids to run with -t or skip tests with -n
-        usage
-        exit 1
-    fi
 
     if [ ! -z "${do_setup}" ]; then
         setup
